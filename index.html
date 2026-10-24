@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Bazaar Store Demo</title>
+  <meta name="description" content="Demo of a Germany-focused Indian grocery store: web shop, WhatsApp ordering, checkout and admin preview." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8a00'/%3E%3Cstop offset='.5' stop-color='%23ff2e63'/%3E%3Cstop offset='1' stop-color='%238a3ffc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Ctext x='16' y='23' font-family='Arial,sans-serif' font-size='19' font-weight='800' fill='%23fff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <div class="demo-banner" data-i18n="demoBanner"></div>
+
+  <header class="hdr">
+    <div class="wrap hdr-in">
+      <a class="brand" href="#/" aria-label="Bazaar home"><span class="brand-mark">B</span><span class="brand-name">Bazaar</span></a>
+      <button class="btn sm ghost plzbtn" id="plzBtn" type="button">📍 <span><span class="meta" data-i18n="deliverTo"></span><br><b id="plzLabel"></b></span></button>
+      <form class="search" id="searchForm" role="search" autocomplete="off">
+        <label class="sr-only" for="q" data-i18n="search"></label>
+        <input id="q" type="search" autocomplete="off" data-i18n-ph="search" />
+        <div class="sug" id="sug" hidden></div>
+      </form>
+      <nav class="hdr-actions" aria-label="Actions">
+        <button class="btn btn-wa sm" id="waBtn" type="button"><span class="dot"></span>WhatsApp</button>
+        <button class="btn sm" id="langBtn" type="button" aria-label="Language">DE</button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor"/></svg></button>
+        <button class="btn btn-primary sm" id="cartBtn" type="button"><span data-i18n="cart"></span><span class="badge-count" id="cartCount">0</span><span class="ctot" id="cartTotal"></span></button>
+      </nav>
+    </div>
+    <nav class="wrap catbar" id="catbar" aria-label="Categories"></nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="wrap" id="view-home" hidden>
+      <nav class="catstrip" id="catStrip" aria-label="Categories"></nav>
+
+      <div class="carousel" id="carousel" aria-roledescription="carousel">
+        <div class="slides" id="slides"></div>
+        <button class="cnav prev" type="button" data-act="c-prev" aria-label="Previous">‹</button>
+        <button class="cnav next" type="button" data-act="c-next" aria-label="Next">›</button>
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <div class="promos">
+        <div class="promo" style="--h:330"><span class="ic">🎁</span><div><div class="pt"><code>WELCOME10</code> · 10% <span data-i18n="promo1t"></span></div><div class="ps" data-i18n="promo1"></div></div></div>
+        <div class="promo" style="--h:150"><span class="ic">🛵</span><div><div class="pt" data-i18n="promo2t"></div><div class="ps" data-i18n="promo2"></div></div></div>
+        <div class="promo plz" style="--h:42">
+          <div class="pt" data-i18n="promo3t"></div>
+          <form id="plzForm"><input id="plzIn" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code" data-i18n-ph="plzPh" /><button class="btn btn-primary" type="submit" data-i18n="check"></button></form>
+          <div class="res" id="plzRes" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><div class="hd"><h2 data-i18n="deals"></h2><span class="timer">⏳ <span data-i18n="dealsEnd"></span> <b id="timer">00:00:00</b></span></div><a href="#/shop?deals=1" data-i18n="viewAll"></a></div>
+        <div class="hscroll" id="dealGrid"></div>
+      </div>
+
+      <div class="sec" id="buyAgainSec" hidden>
+        <div class="sec-head"><div class="hd"><h2 data-i18n="buyAgain"></h2><span class="muted" data-i18n="buyAgainSub"></span></div><button class="btn sm" type="button" data-act="reorder" id="reorderBtn" data-i18n="reorder"></button></div>
+        <div class="hscroll" id="buyAgainGrid"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><div class="hd"><h2 data-i18n="combos"></h2><span class="muted" data-i18n="comboSub"></span></div></div>
+        <div class="combos" id="combos"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-head"><h2 data-i18n="byCat"></h2><a href="#/shop" data-i18n="viewAll"></a></div>
+        <div class="cat-grid" id="catGrid"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2 data-i18n="best"></h2><a href="#/shop" data-i18n="viewAll"></a></div>
+        <div class="grid" id="bestGrid"></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2 data-i18n="how"></h2></div>
+        <div class="steps">
+          <div class="card step" style="--h:42"><span class="ic" aria-hidden="true">🛒</span><div class="num">01</div><h3 data-i18n="h1t"></h3><p data-i18n="h1"></p></div>
+          <div class="card step" style="--h:330"><span class="ic" aria-hidden="true">💳</span><div class="num">02</div><h3 data-i18n="h2t"></h3><p data-i18n="h2"></p></div>
+          <div class="card step" style="--h:262"><span class="ic" aria-hidden="true">🛵</span><div class="num">03</div><h3 data-i18n="h3t"></h3><p data-i18n="h3"></p></div>
+        </div>
+      </div>
+      <div class="card band">
+        <div><h3 data-i18n="waBandT"></h3><p class="muted" data-i18n="waBand"></p></div>
+        <button class="btn btn-primary" type="button" data-act="wa" data-i18n="waSee"></button>
+      </div>
+    </section>
+
+    <!-- SHOP -->
+    <section class="wrap" id="view-shop" hidden>
+      <div style="padding-top:28px"><h1 class="page-title" id="shopTitle"></h1><p class="meta" id="shopCount" style="margin-top:2px"></p></div>
+      <div class="filters" id="filters"></div>
+      <div class="grid" id="shopGrid" style="margin-bottom:56px"></div>
+    </section>
+
+    <!-- CHECKOUT -->
+    <section class="wrap" id="view-checkout" hidden></section>
+
+    <!-- ORDER -->
+    <section class="wrap" id="view-order" hidden></section>
+  </main>
+
+  <footer class="wrap foot">
+    <div class="brand"><span class="brand-mark">B</span><span class="meta" data-i18n="footNote"></span></div>
+    <nav><a href="#/" data-i18n="imprint"></a><a href="#/" data-i18n="tos"></a><a href="#/" data-i18n="privacy"></a><a href="#/" data-i18n="withdrawal"></a><a href="#/" data-i18n="shipping"></a><a href="admin.html">Admin preview →</a></nav>
+  </footer>
+
+  <!-- overlays -->
+  <div class="scrim" id="scrim"></div>
+  <aside class="drawer" id="drawer" aria-label="Cart" aria-hidden="true"></aside>
+  <div class="modal" id="pm" role="dialog" aria-modal="true" aria-hidden="true"></div>
+  <div class="modal" id="waModal" role="dialog" aria-modal="true" aria-hidden="true" style="width:min(820px,calc(100% - 24px))"></div>
+  <div class="toast" id="toast" role="status"></div>
+  <button class="cartbar" id="cartbar" type="button" hidden><span><b id="cbCount"></b> · <b id="cbTotal"></b></span><span data-i18n="viewCart"></span></button>
+
+  <noscript><p style="padding:24px">This demo needs JavaScript.</p></noscript>
+  <script src="assets/data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
